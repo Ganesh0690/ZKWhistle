@@ -13,6 +13,7 @@
     "@demox-labs/aleo-wallet-adapter-leo": "0.0.25",
     "@demox-labs/aleo-wallet-adapter-react": "0.0.21",
     "@demox-labs/aleo-wallet-adapter-reactui": "0.0.35",
+    "@provablehq/wasm": "^0.9.16",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
