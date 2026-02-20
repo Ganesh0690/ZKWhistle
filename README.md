@@ -4,13 +4,13 @@
 >
 > ZKWhistle is a zero-knowledge whistleblower protocol built on Aleo. Organization members can submit anonymous reports with cryptographic proof of membership — without ever revealing their identity.
 
+**[Live Demo](https://zk-whistle-rouge.vercel.app/)** | **[Demo Video](https://youtu.be/YeccBHXTeww)** | **[Deployed Program](https://explorer.provable.com/program/zkwhistle_kumar_v2.aleo)**
+
 ---
 
 ## The Problem
 
-Whistleblowers face retaliation, job loss, and legal threats. Existing reporting systems (hotlines, web forms, email) rely on trust — the platform operator, the company, or a third party can always trace the reporter. Even "anonymous" tip lines often log IP addresses, metadata, or require identifying information.
-
-There is no way to simultaneously prove you are a legitimate member of an organization **and** remain completely anonymous — until now.
+Whistleblowers face retaliation, job loss, and legal threats. Existing reporting systems — hotlines, web forms, email — rely on trust. The platform operator, the company, or a third party can always trace the reporter. Even "anonymous" tip lines often log IP addresses, metadata, or require identifying information.
 
 ## The Solution
 
@@ -21,27 +21,28 @@ ZKWhistle uses Aleo's zero-knowledge proof system to solve this. A member proves
 ```
 ┌─────────────┐      ┌──────────────────┐      ┌────────────────┐
 │  Admin       │      │  Member          │      │  On-Chain       │
-│  registers   │─────▶│  receives secret │      │  (public)       │
-│  org + adds  │      │  hash added to   │      │                 │
-│  member hash │      │  membership list  │      │                 │
+│  registers   │─────▶│  clicks "Join"   │      │  (public)       │
+│  org         │      │  with a secret   │      │                 │
 └─────────────┘      └────────┬─────────┘      │                 │
+                              │  ZK hashes     │                 │
+                              │  secret on     │  Only hash      │
+                              │  device        │  stored          │
                               │                 │                 │
                     ┌─────────▼─────────┐      │  ┌────────────┐ │
                     │  Member submits   │      │  │ report_id  │ │
-                    │  report with      │─────▶│  │ org_id     │ │
-                    │  PRIVATE secret   │  ZK  │  │ content_hash│ │
-                    │  (never revealed) │ proof│  │ severity   │ │
-                    └───────────────────┘      │  │ status     │ │
-                                               │  └────────────┘ │
+                    │  report with      │─────▶│  │ content_hash│ │
+                    │  SAME secret      │  ZK  │  │ severity   │ │
+                    │  (never revealed) │ proof│  │ status     │ │
+                    └───────────────────┘      │  └────────────┘ │
+                                               │                 │
                          Identity: HIDDEN       │  Reporter: ???   │
                                                └────────────────┘
 ```
 
 1. **Admin registers** an organization on-chain
-2. **Member generates** a private secret and computes its BHP256 hash
-3. **Admin adds** the hash to the organization's membership list (never the secret)
-4. **Member submits** a report using their private secret. The ZK circuit hashes it inside the proof, verifies it matches a registered member hash, and publishes the report — with zero link to the reporter's identity
-5. **Admin reviews** reports and updates status (Open → Reviewing → Resolved)
+2. **Member clicks "Join"** — enters a private secret, the ZK circuit hashes it with BHP256 and stores only the hash. One click, no terminal needed.
+3. **Member submits a report** — enters the same secret. The circuit hashes it again, verifies the hash matches a registered member, and publishes the report with zero identity linkage.
+4. **Admin reviews** reports and updates status (Open → Reviewing → Resolved)
 
 ### Privacy Guarantees
 
@@ -57,13 +58,16 @@ ZKWhistle uses Aleo's zero-knowledge proof system to solve this. A member proves
 
 **Even the admin cannot identify who filed a report.** The ZK proof only confirms "a valid member submitted this" — not which member.
 
+**Privacy caveat:** The transaction fee payer address is visible (inherent to Aleo). In production, a relayer service would pay fees on behalf of reporters for full anonymity.
+
 ---
 
 ## Deployed Program
 
-- **Program ID:** `zkwhistle_kumar_v1.aleo`
+- **Program ID:** `zkwhistle_kumar_v2.aleo`
 - **Network:** Aleo Testnet
-- **Deployment TX:** `at1uccgepy604u5t0jnnmq96gzaa4dmc2tgash37rtghe7shat8gqgslyua44`
+- **Deployment TX:** `at1uug89x2cqs7dqaznve0dz2wfeyuyyw9q36gul2scz9g5kjql4q8qa32uju`
+- **Live Site:** [zk-whistle-rouge.vercel.app](https://zk-whistle-rouge.vercel.app/)
 
 ### On-Chain Mappings
 
@@ -80,7 +84,8 @@ ZKWhistle uses Aleo's zero-knowledge proof system to solve this. A member proves
 | Transition | Who | Description |
 |-----------|-----|-------------|
 | `register_org(org_id, name_hash)` | Anyone | Register a new organization |
-| `add_member(org_id, member_hash)` | Admin | Add a member by their hash |
+| `join_org(org_id, member_secret)` | Anyone | Join org — ZK hashes secret on-chain. One click. |
+| `add_member(org_id, member_hash)` | Admin | Add a member by hash (advanced) |
 | `submit_report(org_id, member_secret, report_id, content_hash, severity)` | Member | Submit anonymous report (secret is private) |
 | `update_report_status(org_id, report_id, new_status)` | Admin | Update report status |
 | `compute_member_hash(secret)` | Anyone | Compute BHP256 hash of a secret |
@@ -94,10 +99,11 @@ ZKWhistle uses Aleo's zero-knowledge proof system to solve this. A member proves
 | Smart Contract | Leo (Aleo's ZK programming language) |
 | Network | Aleo Testnet |
 | Frontend | React 18 + Vite |
-| Wallet | Leo Wallet / Shield Wallet (via @demox-labs wallet adapters) |
+| Wallet | Leo Wallet (via @demox-labs wallet adapters) |
 | Styling | Custom CSS — dark investigative theme |
-| Fonts | Crimson Pro (serif headings) + Source Code Pro (mono body) |
+| Fonts | Crimson Pro (serif) + Source Code Pro (mono) |
 | API | Provable Explorer API for on-chain mapping queries |
+| Hosting | Vercel |
 
 ---
 
@@ -107,29 +113,30 @@ ZKWhistle uses Aleo's zero-knowledge proof system to solve this. A member proves
 zkwhistle/
 ├── zkwhistle_program/          # Leo smart contract
 │   ├── src/
-│   │   └── main.leo            # Full program with 5 transitions
-│   ├── inputs/
-│   │   └── zkwhistle_program.in
+│   │   └── main.leo            # Full program with 6 transitions
 │   ├── program.json
-│   └── .env                    # Private key config
+│   └── .env
 ├── src/
 │   ├── components/
 │   │   ├── Header.jsx          # Navigation + wallet connect
-│   │   ├── Dashboard.jsx       # Hero section + live on-chain stats
+│   │   ├── Dashboard.jsx       # Hero + live stats + activity feed + saved data
 │   │   ├── RegisterOrg.jsx     # Organization registration
-│   │   ├── AddMember.jsx       # Member management (add + compute hash)
+│   │   ├── AddMember.jsx       # Join org (one click) + admin add member
 │   │   ├── SubmitReport.jsx    # Anonymous report submission
 │   │   ├── ViewReports.jsx     # Report/org lookup + status updates
 │   │   ├── ConnectScreen.jsx   # Wallet connection prompt
 │   │   └── Footer.jsx
 │   ├── utils/
-│   │   └── aleo.js             # Provable API helpers + struct parser
-│   ├── App.jsx                 # Wallet provider setup
-│   ├── main.jsx                # React entry
-│   └── index.css               # Full dark theme CSS
+│   │   ├── aleo.js             # Provable API helpers + struct parser
+│   │   ├── storage.js          # localStorage auto-save for IDs/secrets
+│   │   └── TxPoll.jsx          # Transaction status polling
+│   ├── App.jsx
+│   ├── main.jsx
+│   └── index.css
 ├── index.html
 ├── package.json
-└── vite.config.js
+├── vite.config.js
+└── vercel.json
 ```
 
 ---
@@ -139,10 +146,10 @@ zkwhistle/
 ### Prerequisites
 
 - [Node.js](https://nodejs.org/) v18+
-- [Leo](https://developer.aleo.org/getting_started/) v3.4.0+
+- [Leo](https://developer.aleo.org/getting_started/) v3.4.0+ (for contract deployment only)
 - [Leo Wallet](https://www.leo.app/) browser extension
 
-### Install & Run Frontend
+### Run Frontend
 
 ```bash
 cd zkwhistle
@@ -156,115 +163,61 @@ Open `http://localhost:5173` and connect your Leo Wallet.
 
 ```bash
 cd zkwhistle_program
-
-# Generate a new Aleo account
-leo account new
-
-# Update .env with your private key
-# PRIVATE_KEY=APrivateKey1zkp...
-
-# Build
 leo build
-
-# Deploy
 leo deploy --network testnet --broadcast
 ```
 
-Then update `PROGRAM_ID` in `src/utils/aleo.js` with your program name.
+Update `PROGRAM_ID` in `src/utils/aleo.js` with your program name.
+
+---
+
+## UX Features
+
+- **Auto-save** — all Org IDs, Report IDs, member secrets saved to localStorage
+- **Quick-fill buttons** — one click to fill any form field from saved data
+- **TX status polling** — live progress bar after every transaction
+- **Activity feed** — timestamped log of all actions on Dashboard
+- **One-click join** — members join with `join_org` transition, no terminal needed
+- **Skeleton loading** — animated placeholders while data loads
 
 ---
 
 ## Demo Flow
 
-### 1. Register Organization
-Navigate to **Register Org** → enter a name → submit → save the Org ID.
-
-### 2. Generate Member Credentials
-Navigate to **Members** → **Compute Hash** tab → generate a secret → run via CLI:
-```bash
-cd zkwhistle_program
-leo run compute_member_hash YOUR_SECRET_field
-```
-Save both the secret (private) and the hash output (share with admin).
-
-### 3. Add Member
-**Members** → **Add Member** tab → enter Org ID + member hash → submit.
-
-### 4. Submit Anonymous Report
-**Submit Report** → enter Org ID + your private secret + report text + severity → submit.
-
-The ZK circuit hashes the secret, verifies membership, and publishes the report with zero identity linkage.
-
-### 5. Verify On-Chain
-**View Reports** → look up the report by ID → see severity, status, content hash, org ID.
-
-**View Reports** → look up the org → see member count, report count, admin.
-
-**View Reports** → check member hash → verify membership.
-
-### 6. Admin Actions
-**View Reports** → **Update Status** → change report status (Open → Reviewing → Resolved → Dismissed).
-
----
-
-## Verified Testnet Transactions
-
-| Action | Transaction ID |
-|--------|---------------|
-| Deploy Program | `at1uccgepy604u5t0jnnmq96gzaa4dmc2tgash37rtghe7shat8gqgslyua44` |
-| Register Org | Verified — org_count = 1 |
-| Add Member | Verified — member hash registered |
-| Submit Report | Verified — total_reports = 1 |
-| Update Status | Verified — status changed to Reviewing |
-
-### Verify Live Data
-
-```bash
-# Check total organizations
-curl https://api.explorer.provable.com/v1/testnet/program/zkwhistle_kumar_v1.aleo/mapping/org_count/0u8
-
-# Check total reports
-curl https://api.explorer.provable.com/v1/testnet/program/zkwhistle_kumar_v1.aleo/mapping/total_reports/0u8
-
-# Look up a specific report
-curl https://api.explorer.provable.com/v1/testnet/program/zkwhistle_kumar_v1.aleo/mapping/reports/205405241field
-```
+1. **Register Org** → enter name → approve → Org ID auto-saved
+2. **Join Organization** → quick-fill org → generate secret → approve → ZK hashes secret on-chain
+3. **Submit Report** → quick-fill org + secret → type report → select severity → approve → anonymous report published
+4. **View Reports** → quick-fill saved report → search → see on-chain data (no reporter address)
+5. **Dashboard** → live stats + activity feed + saved data summary
 
 ---
 
 ## Why Aleo?
 
-ZKWhistle is only possible on Aleo because:
-
-1. **Private inputs to transitions** — the member's secret never appears in the transaction or on-chain. It is a private input that only exists inside the ZK proof.
-
-2. **On-chain verification without exposure** — the BHP256 hash check happens inside the ZK circuit. The network verifies the proof is valid without learning the secret.
-
-3. **No metadata leakage** — unlike Ethereum or Solana, Aleo transactions don't inherently link `msg.sender` to the action. The `submit_report` transition takes `org_id` and `member_secret` as private inputs, so the reporter's address is not part of the public on-chain record.
-
-4. **Programmable privacy** — admins can update report status publicly while the reporter's identity remains permanently hidden. This selective transparency is core to Aleo's design.
+1. **Private inputs to transitions** — the member's secret is a private input that only exists inside the ZK proof
+2. **On-chain verification without exposure** — BHP256 hash check happens inside the ZK circuit
+3. **No metadata leakage** — reporter's address is not part of the report data structure
+4. **Programmable privacy** — admins update report status publicly while reporter identity stays hidden
 
 ---
 
 ## Use Cases
 
-- **Corporate whistleblowing** — employees report fraud, harassment, or safety violations without fear of retaliation
-- **Government transparency** — civil servants expose corruption with cryptographic proof of insider status
+- **Corporate whistleblowing** — employees report fraud without fear of retaliation
+- **Government transparency** — civil servants expose corruption with proof of insider status
 - **Academic integrity** — university members report research misconduct anonymously
 - **Healthcare reporting** — medical staff report safety concerns without career risk
-- **DAO governance** — token holders raise concerns about leadership without social pressure
-- **Journalism** — sources prove organizational membership to reporters without revealing identity
+- **DAO governance** — token holders raise concerns without social pressure
 
 ---
 
 ## Future Improvements
 
+- Relayer service for fee payment (full address anonymity)
 - Encrypted report content (stored off-chain, hash on-chain)
-- Multi-org membership verification
 - Time-locked report reveals
 - Reward mechanism for verified reports
 - IPFS integration for report attachments
-- Cross-organization reporting dashboards
 
 ---
 
