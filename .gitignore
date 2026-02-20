@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.leo/
+outputs/
+*.avm
+*.prover
+*.verifier
+.env
+.DS_Store
