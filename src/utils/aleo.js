@@ -1,5 +1,5 @@
 const API_BASE = "https://api.explorer.provable.com/v1/testnet";
-const PROGRAM_ID = "zkwhistle_kumar_v1.aleo";
+const PROGRAM_ID = "zkwhistle_kumar_v2.aleo";
 
 function parseAleoStruct(raw) {
   if (typeof raw !== "string") return raw;

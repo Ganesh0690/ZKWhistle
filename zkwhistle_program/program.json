@@ -1,6 +1,6 @@
 {
-  "program": "zkwhistle_kumar_v1.aleo",
+  "program": "zkwhistle_kumar_v2.aleo",
   "version": "0.1.0",
-  "description": "ZK Whistleblower System - Anonymous Reports with Proof of Membership",
+  "description": "ZK Whistleblower System v2",
   "license": "MIT"
 }

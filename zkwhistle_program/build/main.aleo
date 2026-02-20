@@ -1,4 +1,4 @@
-program zkwhistle_kumar_v1.aleo;
+program zkwhistle_kumar_v2.aleo;
 
 struct OrgInfo:
     name_hash as field;
@@ -43,7 +43,7 @@ function register_org:
     input r0 as field.public;
     input r1 as field.public;
     async register_org r0 r1 self.caller into r2;
-    output r2 as zkwhistle_kumar_v1.aleo/register_org.future;
+    output r2 as zkwhistle_kumar_v2.aleo/register_org.future;
 
 finalize register_org:
     input r0 as field.public;
@@ -62,7 +62,7 @@ function add_member:
     input r0 as field.public;
     input r1 as field.public;
     async add_member r0 r1 self.caller into r2;
-    output r2 as zkwhistle_kumar_v1.aleo/add_member.future;
+    output r2 as zkwhistle_kumar_v2.aleo/add_member.future;
 
 finalize add_member:
     input r0 as field.public;
@@ -76,6 +76,23 @@ finalize add_member:
     cast r3.name_hash r3.admin r4 r3.report_count r3.is_active into r5 as OrgInfo;
     set r5 into organizations[r0];
 
+function join_org:
+    input r0 as field.public;
+    input r1 as field.private;
+    hash.bhp256 r1 into r2 as field;
+    async join_org r0 r2 into r3;
+    output r3 as zkwhistle_kumar_v2.aleo/join_org.future;
+
+finalize join_org:
+    input r0 as field.public;
+    input r1 as field.public;
+    get organizations[r0] into r2;
+    assert.eq r2.is_active true;
+    set true into members[r1];
+    add r2.member_count 1u64 into r3;
+    cast r2.name_hash r2.admin r3 r2.report_count r2.is_active into r4 as OrgInfo;
+    set r4 into organizations[r0];
+
 function submit_report:
     input r0 as field.private;
     input r1 as field.private;
@@ -84,7 +101,7 @@ function submit_report:
     input r4 as u8.public;
     hash.bhp256 r1 into r5 as field;
     async submit_report r0 r5 r2 r3 r4 into r6;
-    output r6 as zkwhistle_kumar_v1.aleo/submit_report.future;
+    output r6 as zkwhistle_kumar_v2.aleo/submit_report.future;
 
 finalize submit_report:
     input r0 as field.public;
@@ -114,7 +131,7 @@ function update_report_status:
     input r1 as field.public;
     input r2 as u8.public;
     async update_report_status r0 r1 r2 self.caller into r3;
-    output r3 as zkwhistle_kumar_v1.aleo/update_report_status.future;
+    output r3 as zkwhistle_kumar_v2.aleo/update_report_status.future;
 
 finalize update_report_status:
     input r0 as field.public;
