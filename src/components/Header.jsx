@@ -1,5 +1,5 @@
 import React from "react";
-import { WalletMultiButton } from "@demox-labs/aleo-wallet-adapter-reactui";
+import { WalletMultiButton } from "@provablehq/aleo-wallet-adaptor-react-ui";
 const NAV = [
   { id: "dashboard", label: "Dashboard" },
   { id: "register", label: "Register Org" },
@@ -15,7 +15,7 @@ export default function Header({ activeTab, setActiveTab }) {
         <span className="header-title">ZK<span>Whistle</span></span>
       </div>
       <nav className="header-nav">
-        {NAV.map((n) => (<button key={n.id} className={`header-nav-item${activeTab === n.id ? " active" : ""}`} onClick={() => setActiveTab(n.id)}>{n.label}</button>))}
+        {NAV.map((n) => (<button key={n.id} className={"header-nav-item" + (activeTab === n.id ? " active" : "")} onClick={() => setActiveTab(n.id)}>{n.label}</button>))}
       </nav>
       <div className="header-actions">
         <span className="network-badge">Testnet</span>
