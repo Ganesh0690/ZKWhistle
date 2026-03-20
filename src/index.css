@@ -153,3 +153,4 @@ tbody tr:last-child td{border-bottom:none}
 .quick-fill-btn{padding:4px 10px;font-size:10px;font-weight:600;color:var(--accent);background:var(--accent-dim);border:1px solid rgba(196,149,58,0.15);border-radius:var(--radius-sm);cursor:pointer;transition:var(--transition);font-family:var(--font-mono);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .quick-fill-btn:hover{background:rgba(196,149,58,0.2);border-color:var(--accent)}
 @media(max-width:768px){.header{padding:0 16px}.main-content{padding:20px 16px}.form-grid{grid-template-columns:1fr}.stats-row{grid-template-columns:1fr 1fr}.hero{padding:32px 24px}.howit-grid{grid-template-columns:1fr}.header-nav{display:none}}
+.activity-dot.bounty_paid{background:#4a9a6e}

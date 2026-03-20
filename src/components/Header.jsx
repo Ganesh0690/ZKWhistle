@@ -6,6 +6,7 @@ const NAV = [
   { id: "members", label: "Members" },
   { id: "report", label: "Submit Report" },
   { id: "view", label: "View Reports" },
+  { id: "bounty", label: "Bounty" },
 ];
 export default function Header({ activeTab, setActiveTab }) {
   return (

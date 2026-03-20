@@ -12,19 +12,17 @@ import RegisterOrg from "./components/RegisterOrg";
 import AddMember from "./components/AddMember";
 import SubmitReport from "./components/SubmitReport";
 import ViewReports from "./components/ViewReports";
+import BountyReward from "./components/BountyReward";
 import Footer from "./components/Footer";
 export default function App() {
   const [activeTab, setActiveTab] = useState("dashboard");
   return (
     <AleoWalletProvider
-      wallets={[
-        new ShieldWalletAdapter(),
-        new LeoWalletAdapter(),
-      ]}
+      wallets={[new ShieldWalletAdapter(), new LeoWalletAdapter()]}
       autoConnect={true}
       network={Network.TESTNET}
       decryptPermission={DecryptPermission.NoDecrypt}
-      programs={["zkwhistle_kumar_v2.aleo"]}
+      programs={["zkwhistle_kumar_v2.aleo", "credits.aleo"]}
       onError={(error) => console.error(error.message)}
     >
       <WalletModalProvider>
@@ -36,6 +34,7 @@ export default function App() {
             {activeTab === "members" && <AddMember />}
             {activeTab === "report" && <SubmitReport />}
             {activeTab === "view" && <ViewReports />}
+            {activeTab === "bounty" && <BountyReward />}
           </main>
           <Footer />
         </div>
